@@ -64,27 +64,37 @@ with colC:
     st.markdown(f"• Leverage: **{leverage}x**")
     st.markdown(f"• Bet: **£{bet_gbp}**")
 
-# --- 4. Simple Horizontal Trade Chart ---
+# --- 4. Simple Visual Trade Chart (with annotations) ---
 st.divider()
 st.subheader("📈 Trade Setup Chart")
 
-fig, ax = plt.subplots(figsize=(6, 2))
+fig, ax = plt.subplots(figsize=(6, 2.5))
 
-# Plot horizontal lines
-ax.axhline(entry_price, color="blue", linestyle="--", label=f"Entry ${entry_price}")
-ax.axhline(exit_price, color="purple", linestyle="--", label=f"Exit ${exit_price}")
-ax.axhline(take_profit, color="green", linestyle="--", label=f"Take Profit ${take_profit}")
-ax.axhline(stop_loss, color="red", linestyle="--", label=f"Stop Loss ${stop_loss}")
+# Plot price levels
+ax.axhline(entry_price, color="blue", linestyle="--", label=f"Entry: ${entry_price}")
+ax.axhline(take_profit, color="green", linestyle="--", label=f"Take Profit: ${take_profit}")
+ax.axhline(stop_loss, color="red", linestyle="--", label=f"Stop Loss: ${stop_loss}")
+ax.axhline(exit_price, color="purple", linestyle="--", label=f"Exit: ${exit_price}")
 
-# Make it tidy
-ax.set_title("Your Trade Setup")
-ax.set_xlabel("Trade Timeline")
+# Fill profit/loss zones
+if trade_type.lower() == "short":
+    if take_profit < entry_price:
+        ax.fill_betweenx([take_profit, entry_price], x1=0, x2=1, color="green", alpha=0.1, label="Profit Zone")
+    if stop_loss > entry_price:
+        ax.fill_betweenx([entry_price, stop_loss], x1=0, x2=1, color="red", alpha=0.1, label="Loss Zone")
+else:
+    if take_profit > entry_price:
+        ax.fill_betweenx([entry_price, take_profit], x1=0, x2=1, color="green", alpha=0.1, label="Profit Zone")
+    if stop_loss < entry_price:
+        ax.fill_betweenx([stop_loss, entry_price], x1=0, x2=1, color="red", alpha=0.1, label="Loss Zone")
+
+# Clean up chart
+ax.set_title("Visual of Your Trade Setup")
+ax.set_xlabel("Timeline")
 ax.set_ylabel("Price ($)")
 ax.legend(loc="center left", bbox_to_anchor=(1.0, 0.5))
-ax.set_yticks(sorted(set([entry_price, exit_price, take_profit, stop_loss])))
+ax.set_yticks(sorted(set([entry_price, take_profit, stop_loss, exit_price])))
 ax.grid(True)
 
 st.pyplot(fig)
-
-st.caption("This tool is for educational and simulation purposes only. Always DYOR before investing.")
 
