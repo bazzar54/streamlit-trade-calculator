@@ -13,7 +13,7 @@ with col1:
     entry_price = st.number_input("🎯 Entry Price ($)", value=2.17, step=0.01, help="Price you enter the trade.")
     exit_price = st.number_input("🚪 Exit Price ($)", value=2.05, step=0.01, help="Price you plan to exit the trade.")
     leverage = st.slider("⚡ Leverage", 1.0, 10.0, 3.0, 0.5, help="3x leverage on £100 = £300 position.")
-    
+
 with col2:
     bet_gbp = st.number_input("💷 Your Bet (£)", value=100.0, step=10.0, help="Your own money in the trade.")
     take_profit = st.number_input("🟢 Take Profit Target ($)", value=2.05, step=0.01, help="Your ideal exit for profit.")
@@ -57,6 +57,11 @@ with colC:
     st.markdown("### ✅ Summary")
     st.markdown(f"• Trade Type: **{trade_type}**")
     st.markdown(f"• Entry: **${entry_price}**")
-st.markdown(f"• Exit: **${exit_price}**")
+    st.markdown(f"• Exit: **${exit_price}**")
+    st.markdown(f"• Take Profit: **${take_profit}**")
+    st.markdown(f"• Stop Loss: **${stop_loss}**")
+    st.markdown(f"• Leverage: **{leverage}x**")
+    st.markdown(f"• Bet: **£{bet_gbp}**")
 
-    st.markdown
+st.caption("This tool is for educational and simulation purposes only. Always DYOR before investing.")
+
