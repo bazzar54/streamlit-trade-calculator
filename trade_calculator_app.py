@@ -56,5 +56,7 @@ with colB:
 with colC:
     st.markdown("### ✅ Summary")
     st.markdown(f"• Trade Type: **{trade_type}**")
-    st.markdown(f"• Entry: **${entry_price}**  | Exit: **${exit_price}**")
+    st.markdown(f"• Entry: **${entry_price}**")
+st.markdown(f"• Exit: **${exit_price}**")
+
     st.markdown
