@@ -27,5 +27,5 @@ st.info(f"📊 **Your Position Size:** £{position_size:.2f} (Bet × Leverage)")
 
 # 🧮 Profit calculation
 if trade_type.lower() == "short":
-    price_move_percent = (entry_price - exit_price) / entry_price_
+    price_move_percent = (entry_price - exit_price) / entry_price
 
