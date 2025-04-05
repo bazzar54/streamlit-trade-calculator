@@ -1,4 +1,5 @@
 import streamlit as st
+import matplotlib.pyplot as plt
 
 st.set_page_config(page_title="Crypto Profit Calculator", page_icon="🧮", layout="wide")
 
@@ -39,7 +40,7 @@ risk = abs(loss_sl)
 reward = abs(profit_tp)
 risk_reward_ratio = reward / risk if risk != 0 else 0
 
-# --- 3. Display Everything Compactly ---
+# --- 3. Display Metrics Neatly ---
 st.divider()
 colA, colB, colC = st.columns(3)
 
@@ -62,6 +63,28 @@ with colC:
     st.markdown(f"• Stop Loss: **${stop_loss}**")
     st.markdown(f"• Leverage: **{leverage}x**")
     st.markdown(f"• Bet: **£{bet_gbp}**")
+
+# --- 4. Simple Horizontal Trade Chart ---
+st.divider()
+st.subheader("📈 Trade Setup Chart")
+
+fig, ax = plt.subplots(figsize=(6, 2))
+
+# Plot horizontal lines
+ax.axhline(entry_price, color="blue", linestyle="--", label=f"Entry ${entry_price}")
+ax.axhline(exit_price, color="purple", linestyle="--", label=f"Exit ${exit_price}")
+ax.axhline(take_profit, color="green", linestyle="--", label=f"Take Profit ${take_profit}")
+ax.axhline(stop_loss, color="red", linestyle="--", label=f"Stop Loss ${stop_loss}")
+
+# Make it tidy
+ax.set_title("Your Trade Setup")
+ax.set_xlabel("Trade Timeline")
+ax.set_ylabel("Price ($)")
+ax.legend(loc="center left", bbox_to_anchor=(1.0, 0.5))
+ax.set_yticks(sorted(set([entry_price, exit_price, take_profit, stop_loss])))
+ax.grid(True)
+
+st.pyplot(fig)
 
 st.caption("This tool is for educational and simulation purposes only. Always DYOR before investing.")
 
