@@ -65,16 +65,16 @@ colA, colB, colC = st.columns(3)
 # --- Metrics ---
 with colA:
     st.markdown("### 📊 Trade Metrics")
-    st.markdown(f"**💰 Est. Profit:** £{profit:.2f}")
-    st.markdown(f"**💷 Final Balance:** £{final_balance:.2f}")
-    st.markdown(f"**📊 Position Size:** £{position_size:.2f}")
-    st.markdown(f"**🟢 Profit at TP:** £{profit_tp:.2f}")
-    st.markdown(f"**🔴 Loss at SL:** £{loss_sl:.2f}")
+    st.markdown(f"<span style='font-size:16px;'>💰 Est. Profit: £{profit:.2f}</span>", unsafe_allow_html=True)
+    st.markdown(f"<span style='font-size:16px;'>💷 Final Balance: £{final_balance:.2f}</span>", unsafe_allow_html=True)
+    st.markdown(f"<span style='font-size:16px;'>📊 Position Size: £{position_size:.2f}</span>", unsafe_allow_html=True)
+    st.markdown(f"<span style='font-size:16px;'>🟢 Profit at TP: £{profit_tp:.2f}</span>", unsafe_allow_html=True)
+    st.markdown(f"<span style='font-size:16px;'>🔴 Loss at SL: £{loss_sl:.2f}</span>", unsafe_allow_html=True)
 
     rr_color = "green" if risk_reward_ratio >= 2.0 else "red"
     rr_tip = "A good trade setup usually has at least a 2:1 risk/reward ratio."
     st.markdown(
-        f"<span title='{rr_tip}' style='font-size: 16px; font-weight:bold;'>"
+        f"<span title='{rr_tip}' style='font-size:16px; font-weight:bold;'>"
         f"🔁 Risk/Reward: <span style='color:{rr_color}'>{risk_reward_ratio:.2f} : 1</span>"
         f"</span>",
         unsafe_allow_html=True
@@ -83,29 +83,28 @@ with colA:
 # --- Trade Setup Overview ---
 with colB:
     st.markdown("### 🔍 Trade Setup Overview")
-    st.markdown(f"**📉 Trade Type:** `{trade_type.upper()}`")
-    st.markdown(f"**💼 Entry Price:** ${entry_price}")
-    st.markdown(f"**🚪 Exit Price:** ${exit_price}")
-    st.markdown(f"**🟢 Take Profit:** ${take_profit}")
-    st.markdown(f"**🔴 Stop Loss:** ${stop_loss}")
-    st.markdown(f"**⚡ Leverage:** {leverage}x")
-    st.markdown(f"**💷 Bet Size:** £{bet_gbp}")
+    st.markdown(f"<span style='font-size:16px;'>📉 Trade Type: {trade_type.upper()}</span>", unsafe_allow_html=True)
+    st.markdown(f"<span style='font-size:16px;'>💼 Entry Price: ${entry_price}</span>", unsafe_allow_html=True)
+    st.markdown(f"<span style='font-size:16px;'>🚪 Exit Price: ${exit_price}</span>", unsafe_allow_html=True)
+    st.markdown(f"<span style='font-size:16px;'>🟢 Take Profit: ${take_profit}</span>", unsafe_allow_html=True)
+    st.markdown(f"<span style='font-size:16px;'>🔴 Stop Loss: ${stop_loss}</span>", unsafe_allow_html=True)
+    st.markdown(f"<span style='font-size:16px;'>⚡ Leverage: {leverage}x</span>", unsafe_allow_html=True)
+    st.markdown(f"<span style='font-size:16px;'>💷 Bet Size: £{bet_gbp}</span>", unsafe_allow_html=True)
 
 # --- Trade Breakdown Summary ---
 with colC:
     st.markdown("### 🧠 Trade Breakdown Summary")
-    trade_direction = "you profit if the price **drops**" if trade_type.lower() == "short" else "you profit if the price **goes up**"
+    trade_direction = "you profit if the price <strong>drops</strong>" if trade_type.lower() == "short" else "you profit if the price <strong>goes up</strong>"
     summary_text = f"""
-    You’re using **£{bet_gbp:.2f}**, but with **{leverage:.1f}x leverage**, so you’re actually trading **£{position_size:.2f}**.
-
-    You’re **{trade_type.lower()}ing** — so {trade_direction}  
-
-    **Entry = ${entry_price:.2f} → Exit = ${exit_price:.2f}** = a price move of **${price_diff:.2f}**
-
-    That move = **{price_move_percent_display:.2f}%** of ${entry_price:.2f}  
-    So your profit = **{price_move_percent_display:.2f}% of £{position_size:.2f} = £{profit:.2f}**
+    <div style='font-size:16px;'>
+    You’re using <strong>£{bet_gbp:.2f}</strong>, but with <strong>{leverage:.1f}x leverage</strong>, so you’re actually trading <strong>£{position_size:.2f}</strong>.<br><br>
+    You’re <strong>{trade_type.lower()}ing</strong> — so {trade_direction}<br><br>
+    Entry = <strong>${entry_price:.2f}</strong> → Exit = <strong>${exit_price:.2f}</strong> = a price move of <strong>${price_diff:.2f}</strong><br><br>
+    That move = <strong>{price_move_percent_display:.2f}%</strong> of ${entry_price:.2f}<br>
+    So your profit = <strong>{price_move_percent_display:.2f}% of £{position_size:.2f} = £{profit:.2f}</strong>
+    </div>
     """
-    st.markdown(summary_text)
+    st.markdown(summary_text, unsafe_allow_html=True)
 
 # --- Chart ---
 st.divider()
