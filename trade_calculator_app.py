@@ -2,11 +2,10 @@ import streamlit as st
 import matplotlib.pyplot as plt
 
 st.set_page_config(page_title="Crypto Profit Calculator", page_icon="🧮", layout="wide")
-
 st.title("🧮 Crypto Trade Profit Calculator")
 st.caption("Quickly calculate potential profits and losses on long/short trades with leverage.")
 
-# --- Load Signal Button + State ---
+# --- Load Simulated Signal ---
 if "loaded_signal" not in st.session_state:
     st.session_state.loaded_signal = False
 
@@ -21,7 +20,7 @@ if st.button("⚡ Load Latest Gigabrain Signal"):
     st.session_state.loaded_signal = True
     st.success("✅ Signal loaded: SHORT | Entry $594 | TP $580 | SL $605")
 
-# --- Trade Inputs with session_state defaults ---
+# --- Inputs ---
 col1, col2 = st.columns(2)
 
 with col1:
@@ -31,8 +30,7 @@ with col1:
     )
     entry_price = st.number_input("🎯 Entry Price ($)", value=st.session_state.get("entry_price", 2.17), step=0.01)
     exit_price = st.number_input("🚪 Exit Price ($)", value=st.session_state.get("exit_price", 2.05), step=0.01)
-    leverage = st.slider("⚡ Leverage", 1.0, 10.0, value=st.session_state.get("leverage", 3.0), step=0.5,
-        help="Leverage lets you trade more than your own capital. 3x leverage on £100 = £300 position.")
+    leverage = st.slider("⚡ Leverage", 1.0, 10.0, value=st.session_state.get("leverage", 3.0), step=0.5)
 
 with col2:
     bet_gbp = st.number_input("💷 Your Bet (£)", value=st.session_state.get("bet_gbp", 100.0), step=10.0)
@@ -58,6 +56,8 @@ final_balance = bet_gbp + profit
 risk = abs(loss_sl)
 reward = abs(profit_tp)
 risk_reward_ratio = reward / risk if risk != 0 else 0
+price_diff = abs(entry_price - exit_price)
+price_move_percent_display = abs(price_move_percent) * 100
 
 # --- Display Metrics ---
 st.divider()
@@ -72,26 +72,45 @@ with colB:
     st.metric("🟢 Profit at TP", f"£{profit_tp:.2f}")
     st.metric("🔴 Loss at SL", f"£{loss_sl:.2f}")
 
-    # Risk/Reward with tooltip + color
     rr_color = "green" if risk_reward_ratio >= 2.0 else "red"
+    rr_tip = "A good trade setup usually has at least a 2:1 risk/reward ratio."
     st.markdown(
-        f"<span title='A good trade setup usually has at least a 2:1 risk/reward ratio.'>"
-        f"🔁 <strong style='color:{rr_color}'>Risk/Reward: {risk_reward_ratio:.2f} : 1</strong>"
+        f"<span title='{rr_tip}' style='font-weight:bold;'>"
+        f"🔁 Risk/Reward: <span style='color:{rr_color}'>{risk_reward_ratio:.2f} : 1</span>"
         f"</span>",
         unsafe_allow_html=True
     )
 
 with colC:
-    st.markdown("### ✅ Summary")
-    st.markdown(f"• Trade Type: **{trade_type}**")
-    st.markdown(f"• Entry: **${entry_price}**")
-    st.markdown(f"• Exit: **${exit_price}**")
-    st.markdown(f"• Take Profit: **${take_profit}**")
-    st.markdown(f"• Stop Loss: **${stop_loss}**")
-    st.markdown(f"• Leverage: **{leverage}x**")
-    st.markdown(f"• Bet: **£{bet_gbp}**")
+    st.markdown("### 🔍 Trade Setup Overview")
+    st.markdown(f"**📉 Trade Type:** `{trade_type.upper()}`")
+    st.markdown(f"**💼 Entry Price:** ${entry_price}")
+    st.markdown(f"**🚪 Exit Price:** ${exit_price}")
+    st.markdown(f"**🟢 Take Profit:** ${take_profit}")
+    st.markdown(f"**🔴 Stop Loss:** ${stop_loss}")
+    st.markdown(f"**⚡ Leverage:** {leverage}x")
+    st.markdown(f"**💷 Bet Size:** £{bet_gbp}")
 
-# --- Trade Setup Chart with Zones ---
+# --- Natural Language Summary
+st.divider()
+st.subheader("🧠 Trade Breakdown Summary")
+
+trade_direction = "you profit if the price **drops**" if trade_type.lower() == "short" else "you profit if the price **goes up**"
+summary_text = f"""
+You’re using **£{bet_gbp:.2f}**, but with **{leverage:.1f}x leverage**, so you’re actually trading **£{position_size:.2f}**.
+
+You’re **{trade_type.lower()}ing** — so {trade_direction}
+
+**Entry = ${entry_price:.2f} → Exit = ${exit_price:.2f}** = a price move of **${price_diff:.2f}**
+
+That move = **{price_move_percent_display:.2f}%** of ${entry_price:.2f}
+
+So your profit = **{price_move_percent_display:.2f}% of £{position_size:.2f} = £{profit:.2f}**
+"""
+
+st.markdown(summary_text)
+
+# --- Chart
 st.divider()
 st.subheader("📈 Trade Setup Chart")
 
@@ -101,7 +120,7 @@ ax.axhline(take_profit, color="green", linestyle="--", label=f"Take Profit: ${ta
 ax.axhline(stop_loss, color="red", linestyle="--", label=f"Stop Loss: ${stop_loss}")
 ax.axhline(exit_price, color="purple", linestyle="--", label=f"Exit: ${exit_price}")
 
-# Profit/Loss Zones
+# Zones
 if trade_type.lower() == "short":
     if take_profit < entry_price:
         ax.fill_betweenx([take_profit, entry_price], 0, 1, color="green", alpha=0.1, label="Profit Zone")
@@ -113,7 +132,6 @@ else:
     if stop_loss < entry_price:
         ax.fill_betweenx([stop_loss, entry_price], 0, 1, color="red", alpha=0.1, label="Loss Zone")
 
-# Final Touches
 ax.set_title("Visual of Your Trade Setup")
 ax.set_xlabel("Timeline")
 ax.set_ylabel("Price ($)")
