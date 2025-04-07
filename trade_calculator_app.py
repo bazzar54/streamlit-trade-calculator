@@ -1,24 +1,36 @@
 import streamlit as st
+import pandas as pd
 import matplotlib.pyplot as plt
+import os
 
 st.set_page_config(page_title="Crypto Profit Calculator", page_icon="🧮", layout="wide")
 st.title("🧮 Crypto Trade Profit Calculator")
 st.caption("Quickly calculate potential profits and losses on long/short trades with leverage.")
 
-# --- Load Simulated Signal ---
+# --- Load Signal from CSV ---
+CSV_PATH = "parsed_signals.csv"
+
 if "loaded_signal" not in st.session_state:
     st.session_state.loaded_signal = False
 
 if st.button("⚡️ Load Latest Gigabrain Signal"):
-    st.session_state.trade_type = "Short"
-    st.session_state.entry_price = 594.0
-    st.session_state.exit_price = 580.0
-    st.session_state.take_profit = 580.0
-    st.session_state.stop_loss = 605.0
-    st.session_state.leverage = 5.0
-    st.session_state.bet_gbp = 100.0
-    st.session_state.loaded_signal = True
-    st.success("✅ Signal loaded: SHORT | Entry $594 | TP $580 | SL $605")
+    if os.path.exists(CSV_PATH):
+        df = pd.read_csv(CSV_PATH)
+        if not df.empty:
+            latest = df.iloc[-1]
+            st.session_state.trade_type = "Short"  # Default for now
+            st.session_state.entry_price = float(latest["entry"])
+            st.session_state.exit_price = float(latest["take_profit"])  # Assume user will take profit
+            st.session_state.take_profit = float(latest["take_profit"])
+            st.session_state.stop_loss = float(latest["stop_loss"])
+            st.session_state.leverage = 5.0
+            st.session_state.bet_gbp = 100.0
+            st.session_state.loaded_signal = True
+            st.success(f"✅ Signal loaded: {latest['token']} | Entry ${latest['entry']} | TP ${latest['take_profit']} | SL ${latest['stop_loss']}")
+        else:
+            st.warning("⚠️ Signal file is empty.")
+    else:
+        st.error("❌ Signal file not found.")
 
 # --- Inputs ---
 col1, col2 = st.columns(2)
@@ -62,7 +74,6 @@ price_move_percent_display = abs(price_move_percent) * 100
 st.divider()
 colA, colB, colC = st.columns(3)
 
-# --- Metrics ---
 with colA:
     st.markdown("### 📊 Trade Metrics")
     st.markdown(f"<span style='font-size:16px;'>💰 Est. Profit: £{profit:.2f}</span>", unsafe_allow_html=True)
@@ -80,7 +91,6 @@ with colA:
         unsafe_allow_html=True
     )
 
-# --- Trade Setup Overview ---
 with colB:
     st.markdown("### 🔍 Trade Setup Overview")
     st.markdown(f"<span style='font-size:16px;'>📉 Trade Type: {trade_type.upper()}</span>", unsafe_allow_html=True)
@@ -91,7 +101,6 @@ with colB:
     st.markdown(f"<span style='font-size:16px;'>⚡ Leverage: {leverage}x</span>", unsafe_allow_html=True)
     st.markdown(f"<span style='font-size:16px;'>💷 Bet Size: £{bet_gbp}</span>", unsafe_allow_html=True)
 
-# --- Trade Breakdown Summary ---
 with colC:
     st.markdown("### 🧠 Trade Breakdown Summary")
     trade_direction = "you profit if the price <strong>drops</strong>" if trade_type.lower() == "short" else "you profit if the price <strong>goes up</strong>"
