@@ -15,11 +15,17 @@ if "loaded_signal" not in st.session_state:
 
 if st.button("⚡️ Load Latest Gigabrain Signal"):
     try:
-        df = pd.read_csv(CSV_PATH)
+        with open(CSV_PATH, "r") as f:
+            df = pd.read_csv(f)
+
         df = df.dropna(how='all')
 
         if not df.empty:
             latest = df.iloc[-1]
+
+            for key in ["trade_type", "entry_price", "exit_price", "take_profit", "stop_loss", "leverage", "bet_gbp"]:
+                st.session_state.pop(key, None)
+
             st.session_state.trade_type = "Short"
             st.session_state.entry_price = float(latest["entry"])
             st.session_state.exit_price = float(latest["take_profit"])
@@ -30,13 +36,14 @@ if st.button("⚡️ Load Latest Gigabrain Signal"):
             st.session_state.loaded_signal = True
 
             st.success(
-                f"✅ Signal loaded: {latest['token']} | Entry ${latest['entry']} | "
-                f"TP ${latest['take_profit']} | SL ${latest['stop_loss']}"
+                f"✅ Latest signal loaded:\n"
+                f"Token: {latest['token']}\n"
+                f"Entry: ${latest['entry']} | TP: ${latest['take_profit']} | SL: ${latest['stop_loss']}"
             )
         else:
-            st.warning("⚠️ Signal file is empty.")
+            st.warning("⚠️ The CSV is empty.")
     except Exception as e:
-        st.error(f"❌ Failed to load signal: {e}")
+        st.error(f"❌ Error loading signal: {e}")
 
 # --- Inputs ---
 col1, col2 = st.columns(2)
@@ -75,7 +82,7 @@ risk_reward_ratio = reward / risk if risk != 0 else 0
 price_diff = abs(entry_price - exit_price)
 price_move_percent_display = abs(price_move_percent) * 100
 
-# --- Display All Summaries in One Row (Compact) ---
+# --- Summary Layout ---
 st.divider()
 col1, col2, col3 = st.columns(3)
 
