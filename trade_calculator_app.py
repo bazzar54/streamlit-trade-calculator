@@ -7,7 +7,7 @@ st.set_page_config(page_title="Crypto Profit Calculator", page_icon="🧮", layo
 st.title("🧮 Crypto Trade Profit Calculator")
 st.caption("Quickly calculate potential profits and losses on long/short trades with leverage.")
 
-CSV_PATH = "parsed_signals.csv"
+CSV_PATH = os.path.expanduser("~/Desktop/gigabrainhyperbot/parsed_signals.csv")
 
 # --- Load Signal from CSV ---
 if "loaded_signal" not in st.session_state:
