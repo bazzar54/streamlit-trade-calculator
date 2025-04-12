@@ -14,8 +14,10 @@ if "loaded_signal" not in st.session_state:
     st.session_state.loaded_signal = False
 
 if st.button("⚡️ Load Latest Gigabrain Signal"):
-    if os.path.exists(CSV_PATH):
+    try:
         df = pd.read_csv(CSV_PATH)
+        df = df.dropna(how='all')
+
         if not df.empty:
             latest = df.iloc[-1]
             st.session_state.trade_type = "Short"
@@ -26,11 +28,15 @@ if st.button("⚡️ Load Latest Gigabrain Signal"):
             st.session_state.leverage = 5.0
             st.session_state.bet_gbp = 100.0
             st.session_state.loaded_signal = True
-            st.success(f"✅ Signal loaded: {latest['token']} | Entry ${latest['entry']} | TP ${latest['take_profit']} | SL ${latest['stop_loss']}")
+
+            st.success(
+                f"✅ Signal loaded: {latest['token']} | Entry ${latest['entry']} | "
+                f"TP ${latest['take_profit']} | SL ${latest['stop_loss']}"
+            )
         else:
             st.warning("⚠️ Signal file is empty.")
-    else:
-        st.error("❌ Signal file not found.")
+    except Exception as e:
+        st.error(f"❌ Failed to load signal: {e}")
 
 # --- Inputs ---
 col1, col2 = st.columns(2)
